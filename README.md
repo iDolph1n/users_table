@@ -1,34 +1,34 @@
-# Two Tables
+# Две таблицы
 
-A SQL database project demonstrating table creation and joins with customer and order management.
+Проект базы данных SQL, демонстрирующий создание таблиц и объединения с управлением клиентами и заказами.
 
-## Project Overview
+## Обзор проекта
 
-This project contains SQL scripts for creating and managing a relational database with two main tables:
-- **Customers**: Store customer information including name, surname, age, and contact details
-- **Orders**: Manage orders with foreign key relationships to customers
+Этот проект содержит SQL-скрипты для создания и управления реляционной базой данных с двумя основными таблицами:
+- **Клиенты**: Хранение информации о клиентах, включая имя, фамилию, возраст и контактные данные
+- **Заказы**: Управление заказами с внешними ключами, связывающими их с клиентами
 
-## Files Description
+## Описание файлов
 
 ### 01_create_customers.sql
-Creates the `CUSTOMERS` table with the following columns:
-- `id` (SERIAL PRIMARY KEY) - Unique identifier for each customer
-- `name` (VARCHAR(50) NOT NULL) - Customer's first name
-- `surname` (VARCHAR(50) NOT NULL) - Customer's last name
-- `age` (INT) - Customer's age
-- `phone_number` (VARCHAR(20)) - Customer's phone number
+Создаёт таблицу `CUSTOMERS` со следующими колонками:
+- `id` (SERIAL PRIMARY KEY) - Уникальный идентификатор клиента
+- `name` (VARCHAR(50) NOT NULL) - Имя клиента
+- `surname` (VARCHAR(50) NOT NULL) - Фамилия клиента
+- `age` (INT) - Возраст клиента
+- `phone_number` (VARCHAR(20)) - Номер телефона клиента
 
 ### 02_create_orders.sql
-Creates the `ORDERS` table with:
-- `id` (SERIAL PRIMARY KEY) - Unique identifier for each order
-- `date` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP) - Order timestamp
-- `customer_id` (INT NOT NULL) - Foreign key reference to CUSTOMERS
-- `product_name` (VARCHAR(100) NOT NULL) - Name of ordered product
-- `amount` (INT NOT NULL) - Order amount
-- **Constraint**: `fk_orders_customers` - Foreign key linking to CUSTOMERS.id
+Создаёт таблицу `ORDERS` со следующими колонками:
+- `id` (SERIAL PRIMARY KEY) - Уникальный идентификатор заказа
+- `date` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP) - Временная метка заказа
+- `customer_id` (INT NOT NULL) - Внешний ключ ссылка на CUSTOMERS
+- `product_name` (VARCHAR(100) NOT NULL) - Название заказанного товара
+- `amount` (INT NOT NULL) - Сумма заказа
+- **Ограничение**: `fk_orders_customers` - Внешний ключ, связывающий CUSTOMERS.id
 
 ### 03_select_products_by_alexey.sql
-A SELECT query that demonstrates a JOIN operation to find products ordered by customers named "alexey":
+Запрос SELECT, демонстрирующий операцию JOIN для поиска товаров, заказанных клиентами с именем "alexey":
 ```sql
 SELECT o.product_name
 FROM ORDERS o
@@ -36,13 +36,13 @@ JOIN CUSTOMERS c ON o.customer_id = c.id
 WHERE c.name LIKE 'alexey';
 ```
 
-## Getting Started
+## Начало работы
 
-1. Execute `01_create_customers.sql` to create the CUSTOMERS table
-2. Execute `02_create_orders.sql` to create the ORDERS table with foreign key constraint
-3. Run `03_select_products_by_alexey.sql` to query products by customer name
+1. Выполните `01_create_customers.sql` для создания таблицы CUSTOMERS
+2. Выполните `02_create_orders.sql` для создания таблицы ORDERS с ограничением внешнего ключа
+3. Запустите `03_select_products_by_alexey.sql` для выполнения запроса товаров по имени клиента
 
-## Database Schema
+## Схема базы данных
 
 ```
 CUSTOMERS
@@ -60,12 +60,12 @@ ORDERS
 └── amount
 ```
 
-## Technologies
+## Технологии
 
-- SQL (PostgreSQL syntax)
-- Relational Database Design
-- Foreign Key Constraints
+- SQL (синтаксис PostgreSQL)
+- Проектирование реляционной базы данных
+- Ограничения внешних ключей
 
-## License
+## Лицензия
 
 MIT License
