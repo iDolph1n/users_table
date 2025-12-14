@@ -9,25 +9,29 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
 public class CustomerOrderRepository {
 
+    private static final String PRODUCTS_SQL_FILE = "products.sql";
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final String productsByNameSql;
+    private final String productsSql;
 
     public CustomerOrderRepository(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.productsByNameSql = read("products.sql");
+        this.productsSql = read(PRODUCTS_SQL_FILE);
     }
 
     public List<String> getProductNames(String name) {
         var params = new MapSqlParameterSource()
                 .addValue("name", name);
+
         return jdbcTemplate.query(
-                productsByNameSql,
+                productsSql,
                 params,
                 (rs, rowNum) -> rs.getString("product_name")
         );
@@ -35,10 +39,10 @@ public class CustomerOrderRepository {
 
     private static String read(String scriptFileName) {
         try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
-            return bufferedReader.lines().collect(Collectors.joining("\n"));
+             BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            return br.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Cannot read SQL file from classpath: " + scriptFileName, e);
         }
     }
 }
