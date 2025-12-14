@@ -19,7 +19,11 @@ public class Person {
     @Column(name = "city_of_living")
     private String cityOfLiving;
 
-    public Person(String name, String surname, Integer age, String phoneNumber, String cityOfLiving) {
+    public Person(String name,
+                  String surname,
+                  Integer age,
+                  String phoneNumber,
+                  String cityOfLiving) {
         this.id = new PersonId(name, surname, age);
         this.phoneNumber = phoneNumber;
         this.cityOfLiving = cityOfLiving;

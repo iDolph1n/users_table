@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.netology.hibernate.entity.Person;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Repository
 public class PersonRepository {
@@ -16,12 +14,11 @@ public class PersonRepository {
     private EntityManager entityManager;
 
     public List<Person> getPersonsByCity(String city) {
-        List<Person> persons = entityManager
-                .createQuery("select p from Person p", Person.class)
+        return entityManager.createQuery(
+                        "select p from Person p where p.cityOfLiving = :city",
+                        Person.class
+                )
+                .setParameter("city", city)
                 .getResultList();
-
-        return persons.stream()
-                .filter(p -> Objects.equals(p.getCityOfLiving(), city))
-                .collect(Collectors.toList());
     }
 }
