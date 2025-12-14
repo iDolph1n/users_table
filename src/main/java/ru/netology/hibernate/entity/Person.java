@@ -1,6 +1,9 @@
 package ru.netology.hibernate.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
@@ -19,11 +22,7 @@ public class Person {
     @Column(name = "city_of_living")
     private String cityOfLiving;
 
-    public Person(String name,
-                  String surname,
-                  Integer age,
-                  String phoneNumber,
-                  String cityOfLiving) {
+    public Person(String name, String surname, Integer age, String phoneNumber, String cityOfLiving) {
         this.id = new PersonId(name, surname, age);
         this.phoneNumber = phoneNumber;
         this.cityOfLiving = cityOfLiving;

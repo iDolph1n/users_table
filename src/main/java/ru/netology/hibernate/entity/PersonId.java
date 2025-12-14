@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Embeddable
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PersonId implements Serializable {
