@@ -227,8 +227,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
 ## Лицензия
 
-MIT
+[MIT License](LICENSE)
 
 ## Автор
 
-iDolph1n
+[iDolph1n](https://github.com/iDolph1n)
