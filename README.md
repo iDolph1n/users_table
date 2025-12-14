@@ -1,179 +1,170 @@
-# Две таблицы
+# Две таблицы с Hibernate и JPA
 
 ## Описание
 
-Проект базы данных SQL с полноценным приложением Spring Boot для управления клиентами и заказами. Проект демонстрирует эволюцию от простых SQL-скриптов к полноценному REST API с интеграционными тестами и управлением зависимостями.
+Проект базы данных SQL с полнофункциональным приложением Spring Boot, использующим **JPA (Java Persistence API)** и **Hibernate** для управления клиентами и заказами. Проект демонстрирует эволюцию от простых SQL-скриптов к объектно-ориентированному подходу с использованием ORM (Object-Relational Mapping), REST API с интеграционными тестами и управлением зависимостями.
 
 ## Архитектура проекта
 
-Проект состоит из трех основных компонентов:
+Проект состоит из четырех основных компонентов:
 
-1. **SQL скрипты** (в директории `docs/sql/manual/`) - Базовые DDL и DML операции
-2. **Spring Boot приложение** (в директории `src/`) - REST API для работы с клиентами и заказами
-3. **Тесты** - Интеграционные тесты с использованием MockMvc и JUnit
+1. **SQL скрипты** (в директории `docs/sql/manual/`) - Базовые DDL и DML операции для создания таблиц
+2. **JPA Entities** (в директории `src/main/java/tu/netology/entity/`) - Классы сущностей, аннотированные Hibernate аннотациями
+3. **Spring Data Repositories** (в директории `src/main/java/tu/netology/repository/`) - Repository интерфейсы для доступа к данным
+4. **REST Controllers** (в директории `src/main/java/tu/netology/controller/`) - REST API для работы с клиентами и заказами
+5. **Тесты** - Интеграционные тесты с использованием MockMvc и JUnit
 
 ## Обзор проекта
 
-Этот проект содержит SQL-скрипты для создания и управления реляционной базой данных с двумя основными таблицами, а также полноценное Java приложение на Spring Boot для управления этими данными через REST API:
+Этот проект содержит SQL-скрипты для создания и управления реляционной базой данных с двумя основными таблицами, а также полнофункциональное Java приложение на Spring Boot с использованием ORM для управления этими данными через REST API:
 
 - **Клиенты** (CUSTOMERS): Хранение информации о клиентах, включая имя, фамилию, возраст и контактные данные
 - **Заказы** (ORDERS): Управление заказами с внешними ключами, связывающими их с клиентами
 
-## Описание файлов
+## JPA Entities
 
-### SQL скрипты
+### Customer Entity
 
-#### 01_create_customers.sql
+```java
+@Entity
+@Table(name = "customers")
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String name;
+    
+    @Column(nullable = false)
+    private String surname;
+    
+    @Column
+    private Integer age;
+    
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Order> orders;
+}
+```
 
-Создаёт таблицу `CUSTOMERS` со следующими колонками:
+### Order Entity
 
-- `id` (SERIAL PRIMARY KEY) - Уникальный идентификатор клиента
-- `name` (VARCHAR(50) NOT NULL) - Имя клиента
-- `surname` (VARCHAR(50) NOT NULL) - Фамилия клиента
-- `age` (INT) - Возраст клиента
-- `phone_number` (VARCHAR(20)) - Номер телефона клиента
+```java
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "date")
+    private LocalDateTime date;
+    
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+    
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+}
+```
 
-#### 02_create_orders.sql
+## Spring Data Repositories
 
-Создаёт таблицу `ORDERS` со следующими колонками:
+```java
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+    List<Customer> findByName(String name);
+    List<Customer> findByAgeGreaterThan(Integer age);
+}
 
-- `id` (SERIAL PRIMARY KEY) - Уникальный идентификатор заказа
-- `date` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP) - Временная метка заказа
-- `customer_id` (INT NOT NULL) - Внешний ключ ссылка на CUSTOMERS
-- `product_name` (VARCHAR(100) NOT NULL) - Название заказанного товара
-- `amount` (INT NOT NULL) - Сумма заказа
-- **Ограничение**: `fk_orders_customers` - Внешний ключ, связывающий CUSTOMERS.id
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    List<Order> findByCustomerId(Long customerId);
+    List<Order> findByProductName(String productName);
+}
+```
 
-#### 03_select_products_by_alexey.sql
+## REST API Endpoints
 
-Запрос SELECT, демонстрирующий операцию JOIN для поиска товаров, заказанных клиентами с именем "alexey".
+### Customers
 
-### Java приложение Spring Boot
+- `GET /api/customers` - Получить всех клиентов
+- `GET /api/customers/{id}` - Получить клиента по ID
+- `POST /api/customers` - Создать нового клиента
+- `PUT /api/customers/{id}` - Обновить данные клиента
+- `DELETE /api/customers/{id}` - Удалить клиента
 
-Приложение предоставляет REST API для работы с данными:
+### Orders
 
-- **Controller** - REST контроллер для обработки HTTP запросов
-- **Service** - Бизнес-логика приложения
-- **Repository** - Слой доступа к данным (Spring Data JPA)
-- **Model** - Классы для представления сущностей
-- **Tests** - Интеграционные тесты с MockMvc и repository тесты
+- `GET /api/orders` - Получить все заказы
+- `GET /api/orders/{id}` - Получить заказ по ID
+- `POST /api/orders` - Создать новый заказ
+- `PUT /api/orders/{id}` - Обновить данные заказа
+- `DELETE /api/orders/{id}` - Удалить заказ
+- `GET /api/orders/customer/{customerId}` - Получить заказы по ID клиента
 
-## Начало работы
+## Конфигурация БД
 
-### Требования
+### application.yml
 
-- Java 11+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users_db
+    username: postgres
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+  sql:
+    init:
+      mode: always
+```
+
+Для разработки с H2 (встроенная БД):
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+```
+
+## Требования
+
+- Java 17 или выше
 - Maven 3.6+
-- PostgreSQL или другая реляционная БД
+- Spring Boot 3.x
+- PostgreSQL 12+ (или H2 для разработки)
+- JPA/Hibernate для ORM
 
-### SQL часть
+## Установка и запуск
 
-1. Выполните `01_create_customers.sql` для создания таблицы CUSTOMERS
-2. Выполните `02_create_orders.sql` для создания таблицы ORDERS с ограничением внешнего ключа
-3. Запустите `03_select_products_by_alexey.sql` для выполнения запроса товаров по имени клиента
+```bash
+# Сборка проекта
+mvn clean package
 
-### Spring Boot приложение
-
-1. Установите зависимости:
-   ```bash
-   mvn clean install
-   ```
-
-2. Запустите приложение:
-   ```bash
-   mvn spring-boot:run
-   ```
-
-3. Приложение будет доступно на `http://localhost:8080`
-
-## Технологический стек
-
-### Backend
-
-- **Spring Boot** - Фреймворк для создания REST API
-- **Spring Data JPA** - ORM для работы с базой данных
-- **Spring Test** - Тестирование приложения
-- **JUnit** - Фреймворк для модульного тестирования
-- **MockMvc** - Для тестирования REST контроллеров
-- **Maven** - Управление зависимостями и сборкой
-
-### Базы данных
-
-- **PostgreSQL** - Основная реляционная база данных
-- **H2** (опционально для тестов) - Встроенная база для интеграционных тестов
-
-### SQL
-
-- **SQL (PostgreSQL синтаксис)** - Язык запросов к БД
-- **DDL операции** - Создание таблиц и ограничений
-- **DML операции** - Вставка, обновление, удаление данных
-- **JOIN операции** - Объединение таблиц
-
-## Схема базы данных
-
-```
-CUSTOMERS
-├── id (PK)
-├── name
-├── surname
-├── age
-└── phone_number
-
-ORDERS
-├── id (PK)
-├── date
-├── customer_id (FK -> CUSTOMERS.id)
-├── product_name
-└── amount
-```
-
-## Структура проекта
-
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/example/twotables/
-│   │       ├── controller/     # REST контроллеры
-│   │       ├── service/        # Бизнес-логика
-│   │       ├── repository/     # Data Access Layer
-│   │       ├── model/          # Модели данных
-│   │       └── TwoTablesApplication.java
-│   └── resources/
-│       └── application.properties
-├── test/
-│   └── java/
-│       └── com/example/twotables/
-│           ├── controller/     # Тесты контроллеров
-│           └── repository/     # Тесты репозитория
-docs/
-└── sql/
-    └── manual/                 # SQL скрипты
-        ├── 01_create_customers.sql
-        ├── 02_create_orders.sql
-        └── 03_select_products_by_alexey.sql
-```
-
-## Примеры API
-
-### Получить всех клиентов
-```
-GET /api/customers
-```
-
-### Получить клиента по ID
-```
-GET /api/customers/{id}
-```
-
-### Получить все заказы
-```
-GET /api/orders
-```
-
-### Получить заказы клиента
-```
-GET /api/orders/customer/{customerId}
+# Запуск приложения
+mvn spring-boot:run
 ```
 
 ## Тестирование
@@ -185,6 +176,7 @@ GET /api/orders/customer/{customerId}
 - Тесты с использованием H2 базы данных для тестирования
 
 Для запуска тестов:
+
 ```bash
 mvn test
 ```
@@ -198,8 +190,13 @@ mvn test
 - **Add Spring Boot application** - Создание основного приложения
 - **Add seed data for local/tests** - Добавление тестовых данных
 - **Add manual SQL scripts** - Добавление SQL скриптов
-- **add Maven Wrapper configuration** - Конфигурация Maven Wrapper
+- **Add Maven Wrapper configuration** - Конфигурация Maven Wrapper
+- **Configure JPA and PostgreSQL connection** - Настройка JPA и подключение к PostgreSQL
 
 ## Лицензия
 
-MIT License
+MIT
+
+## Автор
+
+[iDolph1n](https://github.com/iDolph1n)
