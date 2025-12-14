@@ -1,0 +1,39 @@
+# ===== Build output (Maven/Gradle/IDE) =====
+/target/
+/out/
+/build/
+
+# ===== Logs =====
+*.log
+log/
+logs/
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ===== Eclipse / STS (на всякий случай) =====
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache/
+
+# ===== NetBeans (на всякий случай) =====
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ===== OS junk =====
+.DS_Store
+Thumbs.db
+
+# ===== Optional: local env files =====
+.env
+.env.*
