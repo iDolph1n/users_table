@@ -1,4 +1,4 @@
-package ru.netology.hibernate.entity;
+package ru.netology.users_table.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -9,17 +9,17 @@ import java.io.Serializable;
 @Embeddable
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PersonId implements Serializable {
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "surname", nullable = false, length = 50)
     private String surname;
 
-    @Column(nullable = false)
+    @Column(name = "age", nullable = false)
     private Integer age;
 }
